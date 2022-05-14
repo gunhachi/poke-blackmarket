@@ -1,0 +1,1 @@
+## Initializing Sample of Simple PoS API in GO

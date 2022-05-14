@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS poke_orders;
+DROP TABLE IF EXISTS poke_products;
