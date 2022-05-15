@@ -65,7 +65,7 @@ func TestAddPokemonStockData(t *testing.T) {
 	require.Equal(t, data1.ID, data2.ID)
 	require.Equal(t, data1.PokeName, data2.PokeName)
 	require.Equal(t, data1.Status, data2.Status)
-	require.Equal(t, arg.Amount, data2.PokeStock-data1.PokeStock)
+	require.Equal(t, data2.PokeStock, data1.PokeStock+arg.Amount)
 	require.Equal(t, data1.PokePrice, data2.PokePrice)
 	require.WithinDuration(t, data1.CreatedAt, data2.CreatedAt, time.Second)
 }
@@ -85,7 +85,7 @@ func TestDeductPokemonStockData(t *testing.T) {
 	require.Equal(t, data1.ID, data2.ID)
 	require.Equal(t, data1.PokeName, data2.PokeName)
 	require.Equal(t, data1.Status, data2.Status)
-	require.Equal(t, arg.Amount, data1.PokeStock-data2.PokeStock)
+	require.Equal(t, data2.PokeStock, data1.PokeStock-arg.Amount)
 	require.Equal(t, data1.PokePrice, data2.PokePrice)
 	require.WithinDuration(t, data1.CreatedAt, data2.CreatedAt, time.Second)
 }

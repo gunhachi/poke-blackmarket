@@ -12,8 +12,8 @@ func mockOrderData(t *testing.T, user User, pokemon PokeProduct) PokeOrder {
 	arg := InsertPokemonOrderDataParams{
 		UserID:      user.ID,
 		ProductID:   pokemon.ID,
-		Quantity:    int32(util.RandomAmount()),
-		TotalPrice:  util.RandomAmount(),
+		Quantity:    2,
+		TotalPrice:  2 * pokemon.PokePrice,
 		OrderDetail: util.RandomRole(),
 	}
 
