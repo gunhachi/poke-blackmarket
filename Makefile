@@ -14,7 +14,8 @@ migratedown:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/pokemart?sslmode=disable" -verbose down
 
 sqlc:
-	docker run --rm -v ${pwd}:/src -w /src kjconroy/sqlc generate
+	# docker run --rm -v ${pwd}:/src -w /src kjconroy/sqlc generate
+	sqlc generate
 
 test:
 	go test -v -cover ./...

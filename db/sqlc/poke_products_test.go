@@ -49,3 +49,43 @@ func TestGetPokemonData(t *testing.T) {
 	require.Equal(t, data1.PokePrice, data2.PokePrice)
 	require.WithinDuration(t, data1.CreatedAt, data2.CreatedAt, time.Second)
 }
+
+func TestAddPokemonStockData(t *testing.T) {
+	data1 := mockRandomData(t)
+
+	arg := AddPokemonStockDataParams{
+		Amount: util.RandomAmount(),
+		ID:     data1.ID,
+	}
+
+	data2, err := testQueries.AddPokemonStockData(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, data2)
+
+	require.Equal(t, data1.ID, data2.ID)
+	require.Equal(t, data1.PokeName, data2.PokeName)
+	require.Equal(t, data1.Status, data2.Status)
+	require.Equal(t, arg.Amount, data2.PokeStock-data1.PokeStock)
+	require.Equal(t, data1.PokePrice, data2.PokePrice)
+	require.WithinDuration(t, data1.CreatedAt, data2.CreatedAt, time.Second)
+}
+
+func TestDeductPokemonStockData(t *testing.T) {
+	data1 := mockRandomData(t)
+
+	arg := DeductPokemonStockDataParams{
+		Amount: util.RandomAmount(),
+		ID:     data1.ID,
+	}
+
+	data2, err := testQueries.DeductPokemonStockData(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, data2)
+
+	require.Equal(t, data1.ID, data2.ID)
+	require.Equal(t, data1.PokeName, data2.PokeName)
+	require.Equal(t, data1.Status, data2.Status)
+	require.Equal(t, arg.Amount, data1.PokeStock-data2.PokeStock)
+	require.Equal(t, data1.PokePrice, data2.PokePrice)
+	require.WithinDuration(t, data1.CreatedAt, data2.CreatedAt, time.Second)
+}
