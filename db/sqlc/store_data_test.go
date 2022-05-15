@@ -25,4 +25,6 @@ func TestOrdertx(t *testing.T) {
 
 	require.Equal(t, user.ID, result.Order.UserID)
 	require.Equal(t, pokemon.ID, result.Order.ProductID)
+
+	// require.Error(t, err, errors.New("quantity exceed"))
 }

@@ -20,3 +20,16 @@ UPDATE poke_products
 SET poke_stock = poke_stock + sqlc.arg(amount)
 WHERE id = sqlc.arg(id)
 RETURNING *;
+
+-- name: ListPokemonData :many
+SELECT * FROM poke_products
+ORDER BY id
+LIMIT $1
+OFFSET $2;
+
+-- name: UpdatePokemonData :one
+UPDATE poke_products
+SET status = $2, poke_price = $3, poke_stock = $4
+WHERE id = $1
+RETURNING *;
+

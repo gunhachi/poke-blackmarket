@@ -7,17 +7,16 @@ INSERT INTO poke_orders (
 
 -- name: ListPokemonOrderData :many
 SELECT * FROM poke_orders
-WHERE 
-    user_id = $1 OR
-    product_id = $2
+-- WHERE 
+--     user_id = $1 OR
+--     product_id = $2
 ORDER BY id
-LIMIT $3
-OFFSET $4;
+LIMIT $1
+OFFSET $2;
 
--- name: CancelPokemonOrderData :one
+-- name: CancelPokemonOrderData :exec
 DELETE FROM poke_orders
-WHERE id = $1
-RETURNING product_id;
+WHERE id = $1;
 
 -- name: GetPokemonOrderData :one
 SELECT * FROM poke_orders

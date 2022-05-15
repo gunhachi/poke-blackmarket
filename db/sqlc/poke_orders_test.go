@@ -58,10 +58,10 @@ func TestListPokemonOrderData(t *testing.T) {
 		mockOrderData(t, user, poke)
 	}
 	arg := ListPokemonOrderDataParams{
-		UserID:    user.ID,
-		ProductID: poke.ID,
-		Limit:     5,
-		Offset:    5,
+		// UserID:    user.ID,
+		// ProductID: poke.ID,
+		Limit:  5,
+		Offset: 5,
 	}
 
 	orders, err := testQueries.ListPokemonOrderData(context.Background(), arg)
@@ -78,8 +78,7 @@ func TestCancelPokemonOrderData(t *testing.T) {
 	poke := mockRandomData(t)
 	data := mockOrderData(t, user, poke)
 
-	cancel, err := testQueries.CancelPokemonOrderData(context.Background(), data.ID)
+	err := testQueries.CancelPokemonOrderData(context.Background(), data.ID)
 	require.NoError(t, err)
-	require.NotZero(t, cancel)
 
 }

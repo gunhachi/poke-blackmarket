@@ -3,26 +3,31 @@ package db
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 )
 
 // Store provided functions to exec db query
-type Store struct {
+type Store interface {
+	Querier
+	OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxResult, error)
+}
+
+// Store provided functions to exec db query
+type SQLStore struct {
 	*Queries
 	db *sql.DB
 }
 
 // Create New Store
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
 // ExecTx executes a function within a database transaction
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -54,7 +59,7 @@ type OrderTxResult struct {
 
 // OrderTx perform Order transaction of pokemon and put it into table poke_orders
 // It creates the order, add data in poke order, and update the pokemon stock based on pokemon id
-func (store *Store) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxResult, error) {
+func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxResult, error) {
 	var result OrderTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
@@ -65,10 +70,9 @@ func (store *Store) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxResu
 			return err
 		}
 
-		if arg.Quantity > int32(getPokeData.PokeStock) {
-			err := fmt.Sprintf("Current pokemon %v only having %v left", getPokeData.PokeName, getPokeData.PokeStock)
-			return errors.New(err)
-		}
+		// if arg.Quantity > int32(getPokeData.PokeStock) {
+		// 	return errors.New("quantity exceed")
+		// }
 
 		result.Order, err = q.InsertPokemonOrderData(ctx, InsertPokemonOrderDataParams{
 			UserID:      arg.UserID,

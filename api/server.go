@@ -6,16 +6,29 @@ import (
 )
 
 type Server struct {
-	store *db.Store
+	store db.Store
 	route *gin.Engine
 }
 
 // NewServer creates a new HTTP server and setup routes
-func NewServer(store *db.Store) *Server {
+func NewServer(store db.Store) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
 
 	router.POST("/user", server.createUser)
+	router.GET("/user", server.listUser)
+	router.GET("/user/:id", server.getUser)
+	router.PUT("/user/:id", server.updateUser)
+
+	router.POST("/pokemon", server.createPokemon)
+	router.GET("/pokemon", server.listPokemon)
+	router.GET("/pokemon/:id", server.getPokemon)
+	router.PUT("/pokemon/:id", server.updatePokemon)
+
+	router.POST("/order", server.createOrder)
+	router.GET("/order", server.listOrder)
+	router.GET("/order/:id", server.getOrder)
+	router.DELETE("/order/:id", server.cancelOrder)
 
 	server.route = router
 
