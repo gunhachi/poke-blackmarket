@@ -66,8 +66,7 @@ func (store *Store) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxResu
 		}
 
 		if arg.Quantity > int32(getPokeData.PokeStock) {
-			err := fmt.Sprintf("Current pokemon %v only having %v left", getPokeData.PokeName, getPokeData.PokeStock)
-			return errors.New(err)
+			return errors.New("quantity exceeded")
 		}
 
 		result.Order, err = q.InsertPokemonOrderData(ctx, InsertPokemonOrderDataParams{
