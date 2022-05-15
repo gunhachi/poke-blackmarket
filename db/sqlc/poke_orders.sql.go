@@ -22,6 +22,26 @@ func (q *Queries) CancelPokemonOrderData(ctx context.Context, id int64) (int64, 
 	return product_id, err
 }
 
+const getPokemonOrderData = `-- name: GetPokemonOrderData :one
+SELECT id, user_id, product_id, quantity, total_price, order_detail, created_at FROM poke_orders
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetPokemonOrderData(ctx context.Context, id int64) (PokeOrder, error) {
+	row := q.db.QueryRowContext(ctx, getPokemonOrderData, id)
+	var i PokeOrder
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ProductID,
+		&i.Quantity,
+		&i.TotalPrice,
+		&i.OrderDetail,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const insertPokemonOrderData = `-- name: InsertPokemonOrderData :one
 INSERT INTO poke_orders (
     user_id, product_id,quantity,total_price,order_detail

@@ -18,3 +18,7 @@ OFFSET $4;
 DELETE FROM poke_orders
 WHERE id = $1
 RETURNING product_id;
+
+-- name: GetPokemonOrderData :one
+SELECT * FROM poke_orders
+WHERE id = $1 LIMIT 1;

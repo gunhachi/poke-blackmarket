@@ -39,6 +39,18 @@ func TestInsertPokemonOrderData(t *testing.T) {
 	mockOrderData(t, user, poke)
 }
 
+func TestGetPokemonOrderData(t *testing.T) {
+	user := mockCreateUserAccount(t)
+	poke := mockRandomData(t)
+	order := mockOrderData(t, user, poke)
+	data, err := testQueries.GetPokemonOrderData(context.Background(), order.ID)
+	require.NoError(t, err)
+	require.NotEmpty(t, data)
+
+	require.Equal(t, user.ID, data.UserID)
+	require.Equal(t, poke.ID, data.ProductID)
+}
+
 func TestListPokemonOrderData(t *testing.T) {
 	user := mockCreateUserAccount(t)
 	poke := mockRandomData(t)

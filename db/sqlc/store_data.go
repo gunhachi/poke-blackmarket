@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
@@ -62,6 +63,11 @@ func (store *Store) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxResu
 		getPokeData, err := q.GetPokemonData(ctx, arg.ProductID)
 		if err != nil {
 			return err
+		}
+
+		if arg.Quantity > int32(getPokeData.PokeStock) {
+			err := fmt.Sprintf("Current pokemon %v only having %v left", getPokeData.PokeName, getPokeData.PokeStock)
+			return errors.New(err)
 		}
 
 		result.Order, err = q.InsertPokemonOrderData(ctx, InsertPokemonOrderDataParams{

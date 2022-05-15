@@ -22,4 +22,7 @@ func TestOrdertx(t *testing.T) {
 
 	require.NoError(t, err)
 	require.NotEmpty(t, result)
+
+	require.Equal(t, user.ID, result.Order.UserID)
+	require.Equal(t, pokemon.ID, result.Order.ProductID)
 }
