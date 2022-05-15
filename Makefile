@@ -14,10 +14,15 @@ migratedown:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/pokemart?sslmode=disable" -verbose down
 
 sqlc:
+	# First dev on Windows
 	# docker run --rm -v ${pwd}:/src -w /src kjconroy/sqlc generate
+	# If using Unix-based
 	sqlc generate
 
 test:
 	go test -v -cover ./...
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test
+run:
+	go run main.go
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test run
