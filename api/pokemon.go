@@ -92,6 +92,7 @@ func (server *Server) listPokemon(ctx *gin.Context) {
 }
 
 type updatePokemonData struct {
+	// ID        int64  `json:"id" binding:"required,min=1"`
 	Status    string `json:"status"`
 	PokePrice int64  `json:"poke_price"`
 	PokeStock int64  `json:"poke_stock"`
