@@ -11,18 +11,21 @@ import (
 	"github.com/lib/pq"
 )
 
+// createAccountRequest represent the param for create account
 type createAccountRequest struct {
 	Username string `json:"username" binding:"required,alphanum"`
 	Password string `json:"password" binding:"required,min=6"`
 	FullName string `json:"full_name" binding:"required"`
 }
 
+// responseAccount represent response of handler
 type responseAccount struct {
 	Username  string    `json:"username"`
 	FullName  string    `json:"full_name"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
+// buildAccountResponse build expected response
 func buildAccountResponse(account db.Account) responseAccount {
 	return responseAccount{
 		Username:  account.Username,
@@ -31,6 +34,7 @@ func buildAccountResponse(account db.Account) responseAccount {
 	}
 }
 
+// createAccountLog handler to create account
 func (server *Server) createAccountLog(ctx *gin.Context) {
 	var req createAccountRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -70,16 +74,19 @@ func (server *Server) createAccountLog(ctx *gin.Context) {
 
 }
 
+// loginAccountRequest represent param for login access
 type loginAccountRequest struct {
 	Username string `json:"username" binding:"required,alphanum"`
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+// responseLoginAccount represent response for given access such token
 type responseLoginAccount struct {
 	AccessToken string          `json:"access_token"`
 	User        responseAccount `json:"account"`
 }
 
+// loginAccount handler to login based on existing data
 func (server *Server) loginAccount(ctx *gin.Context) {
 	var req loginAccountRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

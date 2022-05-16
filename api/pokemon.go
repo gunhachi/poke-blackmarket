@@ -9,6 +9,7 @@ import (
 	"github.com/mtslzr/pokeapi-go"
 )
 
+// createPokemonRequest represent request param for create pokemon data
 type createPokemonRequest struct {
 	PokeName  string `json:"poke_name" binding:"required"`
 	Status    string `json:"status" binding:"required"`
@@ -16,6 +17,7 @@ type createPokemonRequest struct {
 	PokeStock int64  `json:"poke_stock" binding:"required"`
 }
 
+// createPokemon handler to create pokemon data on given request
 func (server *Server) createPokemon(ctx *gin.Context) {
 	var req createPokemonRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -40,10 +42,12 @@ func (server *Server) createPokemon(ctx *gin.Context) {
 
 }
 
+// getPokemonRequest bind for id on pokemon data
 type getPokemonRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// getPokemon handler to perform get pokemon data based on id
 func (server *Server) getPokemon(ctx *gin.Context) {
 	var req getPokemonRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -74,6 +78,7 @@ type pokemonAPIResponse struct {
 	BaseExp int    `json:"base_experience"`
 }
 
+// getDataPokemonApi handler to perform get pokemon data based on poke-api usage
 func (server *Server) getDataPokemonApi(ctx *gin.Context) {
 	var req pokemonAPIRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -96,11 +101,13 @@ func (server *Server) getDataPokemonApi(ctx *gin.Context) {
 
 }
 
+// listPokeRequest represent listing parameter
 type listPokeRequest struct {
 	PageID   int32 `form:"page_id" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
+// listPokemon handler to execute get list of pokemon
 func (server *Server) listPokemon(ctx *gin.Context) {
 	var req listPokeRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -123,6 +130,7 @@ func (server *Server) listPokemon(ctx *gin.Context) {
 
 }
 
+// updatePokemonData represent update pokemon data parameter
 type updatePokemonData struct {
 	// ID        int64  `json:"id" binding:"required,min=1"`
 	Status    string `json:"status"`
@@ -130,6 +138,7 @@ type updatePokemonData struct {
 	PokeStock int64  `json:"poke_stock"`
 }
 
+// updatePokemon handler to update data pokemon
 func (server *Server) updatePokemon(ctx *gin.Context) {
 	var req getPokemonRequest
 	var dataReq updatePokemonData

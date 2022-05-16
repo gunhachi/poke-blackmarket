@@ -111,6 +111,7 @@ type listOrderRequest struct {
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
+// listOrder handler to list the order on database
 func (server *Server) listOrder(ctx *gin.Context) {
 	var req listOrderRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -145,6 +146,7 @@ func (server *Server) listOrder(ctx *gin.Context) {
 
 }
 
+// cancelOrder handler to cancel pokemon order data based on id
 func (server *Server) cancelOrder(ctx *gin.Context) {
 	var req getOrderRequest
 	var orderID getOrderUserIDReq
