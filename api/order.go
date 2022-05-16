@@ -11,12 +11,14 @@ import (
 	"github.com/gunhachi/poke-blackmarket/token"
 )
 
+// createOrderRequest represent request payload for creating order
 type createOrderRequest struct {
 	UserID    int64 `json:"user_id" binding:"required"`
 	ProductID int64 `json:"product_id" binding:"required"`
 	Quantity  int32 `json:"quantity" binding:"required"`
 }
 
+// createOrder handler for creating order data and put the transaction into database layer
 func (server *Server) createOrder(ctx *gin.Context) {
 	var req createOrderRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -52,14 +54,17 @@ func (server *Server) createOrder(ctx *gin.Context) {
 
 }
 
+// getOrderRequest represend id of order data for binding parameter to getOrder handler
 type getOrderRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// getOrderUserIDReq represent id of user data for binding parameter to getOrder handler
 type getOrderUserIDReq struct {
 	UserID int64 `json:"user_id" binding:"required"`
 }
 
+// getOrder handler of get order data based on given order id and responding user id
 func (server *Server) getOrder(ctx *gin.Context) {
 	var req getOrderRequest
 	var orderID getOrderUserIDReq
@@ -99,8 +104,9 @@ func (server *Server) getOrder(ctx *gin.Context) {
 
 }
 
+// listOrderRequest represent parameter to list the order data
 type listOrderRequest struct {
-	UserID   int64 `form:"user_id" binding:"required"`
+	UserID   int64 `form:"user_id"`
 	PageID   int32 `form:"page_id" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
