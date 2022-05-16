@@ -2,15 +2,18 @@ package api
 
 import (
 	"database/sql"
+	"errors"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	db "github.com/gunhachi/poke-blackmarket/db/sqlc"
+	"github.com/gunhachi/poke-blackmarket/token"
+	"github.com/lib/pq"
 )
 
 type createUserRequest struct {
-	UserName string `json:"user_name" binding:"required"`
-	UserRole string `json:"user_role" binding:"required,oneof= LEAD GRUNTs"`
+	UserRole string `json:"user_role" binding:"required,oneof= LEAD GRUNT"`
 }
 
 func (server *Server) createUser(ctx *gin.Context) {
@@ -20,13 +23,18 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.CreateUserAccountParams{
-		UserName: req.UserName,
+		UserName: authPayload.Username,
 		UserRole: req.UserRole,
 	}
 
 	user, err := server.store.CreateUserAccount(ctx, arg)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			log.Println(pqErr.Code.Name())
+
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
@@ -54,6 +62,12 @@ func (server *Server) getUser(ctx *gin.Context) {
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.UserName != authPayload.Username {
+		err := errors.New("user dont belong to authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 	}
 
 	ctx.JSON(http.StatusOK, user)

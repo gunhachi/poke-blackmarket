@@ -1,0 +1,5 @@
+ALTER TABLE IF EXISTS "users" DROP CONSTRAINT IF EXISTS "name_role_key";
+
+ALTER TABLE IF EXISTS "users" DROP CONSTRAINT IF EXISTS "users_user_name_fkey";
+
+DROP TABLE IF EXISTS "accounts";

@@ -2,18 +2,19 @@ package api
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	db "github.com/gunhachi/poke-blackmarket/db/sqlc"
+	"github.com/gunhachi/poke-blackmarket/token"
 )
 
 type createOrderRequest struct {
-	UserID      int64  `json:"user_id" binding:"required"`
-	ProductID   int64  `json:"product_id" binding:"required"`
-	Quantity    int32  `json:"quantity" binding:"required"`
-	TotalPrice  int64  `json:"total_price" binding:"required"`
-	OrderDetail string `json:"order_detail" binding:"required"`
+	UserID    int64 `json:"user_id" binding:"required"`
+	ProductID int64 `json:"product_id" binding:"required"`
+	Quantity  int32 `json:"quantity" binding:"required"`
 }
 
 func (server *Server) createOrder(ctx *gin.Context) {
@@ -23,15 +24,25 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.InsertPokemonOrderDataParams{
-		UserID:      req.UserID,
-		ProductID:   req.ProductID,
-		Quantity:    req.Quantity,
-		TotalPrice:  req.TotalPrice,
-		OrderDetail: req.OrderDetail,
+	user, valid := server.validUser(ctx, req.UserID, "GRUNT")
+	if !valid {
+		return
 	}
 
-	order, err := server.store.InsertPokemonOrderData(ctx, arg)
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.UserName != authPayload.Username {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	arg := db.OrderTxParams{
+		UserID:    req.UserID,
+		ProductID: req.ProductID,
+		Quantity:  req.Quantity,
+	}
+
+	order, err := server.store.OrderTx(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -45,10 +56,32 @@ type getOrderRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+type getOrderUserIDReq struct {
+	UserID int64 `json:"user_id" binding:"required"`
+}
+
 func (server *Server) getOrder(ctx *gin.Context) {
 	var req getOrderRequest
+	var orderID getOrderUserIDReq
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if err := ctx.ShouldBindJSON(&orderID); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, valid := server.validUser(ctx, orderID.UserID, "GRUNT")
+	if !valid {
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.UserName != authPayload.Username {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
 
@@ -67,6 +100,7 @@ func (server *Server) getOrder(ctx *gin.Context) {
 }
 
 type listOrderRequest struct {
+	UserID   int64 `form:"user_id" binding:"required"`
 	PageID   int32 `form:"page_id" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
@@ -75,6 +109,18 @@ func (server *Server) listOrder(ctx *gin.Context) {
 	var req listOrderRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, valid := server.validUser(ctx, req.UserID, "LEAD")
+	if !valid {
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.UserName != authPayload.Username {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
 
@@ -95,12 +141,30 @@ func (server *Server) listOrder(ctx *gin.Context) {
 
 func (server *Server) cancelOrder(ctx *gin.Context) {
 	var req getOrderRequest
+	var orderID getOrderUserIDReq
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	err := server.store.CancelPokemonOrderData(ctx, req.ID)
+	if err := ctx.ShouldBindJSON(&orderID); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, valid := server.validUser(ctx, orderID.UserID, "GRUNT")
+	if !valid {
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.UserName != authPayload.Username {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	_, err := server.store.CancelOrderTx(ctx, db.CancelOrderParam{ID: req.ID})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -108,4 +172,26 @@ func (server *Server) cancelOrder(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"deleted": req.ID})
 
+}
+
+// validUser check whether user data valid based on param of id,user_name, and role
+func (server *Server) validUser(ctx *gin.Context, userID int64, role string) (db.User, bool) {
+	user, err := server.store.GetUserAccount(ctx, userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return user, false
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return user, false
+	}
+
+	if user.UserRole != role {
+		err := fmt.Errorf("user [%d] role mismatch: %s vs %s", user.ID, user.UserRole, role)
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return user, false
+	}
+
+	return user, true
 }

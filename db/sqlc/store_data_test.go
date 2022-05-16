@@ -8,11 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestOrdertx(t *testing.T) {
+func mockOrderTx(t *testing.T, user User, pokemon PokeProduct) OrderTxResult {
 	order := NewStore(testDB)
-
-	user := mockCreateUserAccount(t)
-	pokemon := mockRandomData(t)
 
 	result, err := order.OrderTx(context.Background(), OrderTxParams{
 		UserID:    user.ID,
@@ -25,6 +22,27 @@ func TestOrdertx(t *testing.T) {
 
 	require.Equal(t, user.ID, result.Order.UserID)
 	require.Equal(t, pokemon.ID, result.Order.ProductID)
+	return result
+}
 
-	// require.Error(t, err, errors.New("quantity exceed"))
+func TestOrdertx(t *testing.T) {
+	user := mockCreateUserAccount(t)
+	pokemon := mockRandomData(t)
+	mockOrderTx(t, user, pokemon)
+}
+
+func TestCancelOrdertx(t *testing.T) {
+	order := NewStore(testDB)
+
+	user := mockCreateUserAccount(t)
+	pokemon := mockRandomData(t)
+	data := mockOrderTx(t, user, pokemon)
+
+	result, err := order.CancelOrderTx(context.Background(), CancelOrderParam{
+		ID: data.Order.ID,
+	})
+
+	require.NoError(t, err)
+	require.NotEmpty(t, result)
+
 }

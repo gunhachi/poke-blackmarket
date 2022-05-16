@@ -3,8 +3,17 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 )
+
+type Account struct {
+	Username          string       `json:"username"`
+	HashedPassword    string       `json:"hashed_password"`
+	FullName          string       `json:"full_name"`
+	CreatedAt         time.Time    `json:"created_at"`
+	PasswordChangetAt sql.NullTime `json:"password_changet_at"`
+}
 
 type PokeOrder struct {
 	ID        int64 `json:"id"`

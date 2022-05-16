@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	db "github.com/gunhachi/poke-blackmarket/db/sqlc"
+	"github.com/mtslzr/pokeapi-go"
 )
 
 type createPokemonRequest struct {
@@ -61,6 +62,37 @@ func (server *Server) getPokemon(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, poke)
+
+}
+
+type pokemonAPIRequest struct {
+	Name string `uri:"name" binding:"required"`
+}
+
+type pokemonAPIResponse struct {
+	Name    string `json:"name"`
+	BaseExp int    `json:"base_experience"`
+}
+
+func (server *Server) getDataPokemonApi(ctx *gin.Context) {
+	var req pokemonAPIRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	poke, err := pokeapi.Pokemon(req.Name)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	resp := pokemonAPIResponse{
+		Name:    poke.Name,
+		BaseExp: poke.BaseExperience,
+	}
+
+	ctx.JSON(http.StatusOK, resp)
 
 }
 

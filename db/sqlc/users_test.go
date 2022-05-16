@@ -10,8 +10,9 @@ import (
 )
 
 func mockCreateUserAccount(t *testing.T) User {
+	account := mockCreateAccountLog(t)
 	arg := CreateUserAccountParams{
-		UserName: util.RandomUser(),
+		UserName: account.Username,
 		UserRole: util.RandomRole(),
 	}
 

@@ -50,6 +50,21 @@ func (mr *MockStoreMockRecorder) AddPokemonStockData(arg0, arg1 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddPokemonStockData", reflect.TypeOf((*MockStore)(nil).AddPokemonStockData), arg0, arg1)
 }
 
+// CancelOrderTx mocks base method.
+func (m *MockStore) CancelOrderTx(arg0 context.Context, arg1 db.CancelOrderParam) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CancelOrderTx", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CancelOrderTx indicates an expected call of CancelOrderTx.
+func (mr *MockStoreMockRecorder) CancelOrderTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelOrderTx", reflect.TypeOf((*MockStore)(nil).CancelOrderTx), arg0, arg1)
+}
+
 // CancelPokemonOrderData mocks base method.
 func (m *MockStore) CancelPokemonOrderData(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
@@ -62,6 +77,21 @@ func (m *MockStore) CancelPokemonOrderData(arg0 context.Context, arg1 int64) err
 func (mr *MockStoreMockRecorder) CancelPokemonOrderData(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelPokemonOrderData", reflect.TypeOf((*MockStore)(nil).CancelPokemonOrderData), arg0, arg1)
+}
+
+// CreateAccountLog mocks base method.
+func (m *MockStore) CreateAccountLog(arg0 context.Context, arg1 db.CreateAccountLogParams) (db.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAccountLog", arg0, arg1)
+	ret0, _ := ret[0].(db.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateAccountLog indicates an expected call of CreateAccountLog.
+func (mr *MockStoreMockRecorder) CreateAccountLog(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAccountLog", reflect.TypeOf((*MockStore)(nil).CreateAccountLog), arg0, arg1)
 }
 
 // CreatePokemonData mocks base method.
@@ -121,6 +151,21 @@ func (m *MockStore) DeleteUserAccount(arg0 context.Context, arg1 int64) error {
 func (mr *MockStoreMockRecorder) DeleteUserAccount(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserAccount", reflect.TypeOf((*MockStore)(nil).DeleteUserAccount), arg0, arg1)
+}
+
+// GetAccountLog mocks base method.
+func (m *MockStore) GetAccountLog(arg0 context.Context, arg1 string) (db.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAccountLog", arg0, arg1)
+	ret0, _ := ret[0].(db.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAccountLog indicates an expected call of GetAccountLog.
+func (mr *MockStoreMockRecorder) GetAccountLog(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountLog", reflect.TypeOf((*MockStore)(nil).GetAccountLog), arg0, arg1)
 }
 
 // GetPokemonData mocks base method.

@@ -9,10 +9,12 @@ import (
 type Querier interface {
 	AddPokemonStockData(ctx context.Context, arg AddPokemonStockDataParams) (PokeProduct, error)
 	CancelPokemonOrderData(ctx context.Context, id int64) error
+	CreateAccountLog(ctx context.Context, arg CreateAccountLogParams) (Account, error)
 	CreatePokemonData(ctx context.Context, arg CreatePokemonDataParams) (PokeProduct, error)
 	CreateUserAccount(ctx context.Context, arg CreateUserAccountParams) (User, error)
 	DeductPokemonStockData(ctx context.Context, arg DeductPokemonStockDataParams) (PokeProduct, error)
 	DeleteUserAccount(ctx context.Context, id int64) error
+	GetAccountLog(ctx context.Context, username string) (Account, error)
 	GetPokemonData(ctx context.Context, id int64) (PokeProduct, error)
 	GetPokemonOrderData(ctx context.Context, id int64) (PokeOrder, error)
 	GetUserAccount(ctx context.Context, id int64) (User, error)

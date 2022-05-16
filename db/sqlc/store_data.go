@@ -10,6 +10,7 @@ import (
 type Store interface {
 	Querier
 	OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxResult, error)
+	CancelOrderTx(ctx context.Context, arg CancelOrderParam) (string, error)
 }
 
 // Store provided functions to exec db query
@@ -53,8 +54,11 @@ type OrderTxParams struct {
 }
 
 type OrderTxResult struct {
-	Order   PokeOrder   `json:"pokeorder"`
-	Product PokeProduct `json:"product_id"`
+	Order PokeOrder `json:"pokeorder"`
+}
+
+type CancelOrderParam struct {
+	ID int64 `json:"id"`
 }
 
 // OrderTx perform Order transaction of pokemon and put it into table poke_orders
@@ -70,10 +74,6 @@ func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxR
 			return err
 		}
 
-		// if arg.Quantity > int32(getPokeData.PokeStock) {
-		// 	return errors.New("quantity exceed")
-		// }
-
 		result.Order, err = q.InsertPokemonOrderData(ctx, InsertPokemonOrderDataParams{
 			UserID:      arg.UserID,
 			ProductID:   arg.ProductID,
@@ -85,7 +85,7 @@ func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxR
 			return err
 		}
 
-		result.Product, err = q.DeductPokemonStockData(ctx, DeductPokemonStockDataParams{
+		_, err = q.DeductPokemonStockData(ctx, DeductPokemonStockDataParams{
 			ID:     arg.ProductID,
 			Amount: int64(arg.Quantity),
 		})
@@ -96,6 +96,36 @@ func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxR
 		return err
 
 	})
+
+	return result, err
+}
+
+// CancelOrderTx perform cancellation transaction of pokemon and return it stock data into table poke_orders
+// It delete in poke order, and update the pokemon stock based on pokemon id
+func (store *SQLStore) CancelOrderTx(ctx context.Context, arg CancelOrderParam) (string, error) {
+	var result string
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		orderData, err := q.GetPokemonOrderData(ctx, arg.ID)
+		if err != nil {
+			return err
+		}
+
+		_, err = q.AddPokemonStockData(ctx, AddPokemonStockDataParams{
+			ID:     orderData.ProductID,
+			Amount: int64(orderData.Quantity),
+		})
+		if err != nil {
+			result = "Error return stock"
+			return err
+		}
+
+		return err
+
+	})
+	result = "stock returned"
 
 	return result, err
 }
