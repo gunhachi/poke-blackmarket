@@ -214,7 +214,8 @@ func TestGetOrderAPI(t *testing.T) {
 // 	}
 // }
 
-func TestListOrderAccountAPI(t *testing.T) {
+func TestListOrderAPI(t *testing.T) {
+
 	n := 5
 	orders := make([]db.PokeOrder, n)
 	for i := 0; i < n; i++ {
@@ -329,10 +330,6 @@ func TestListOrderAccountAPI(t *testing.T) {
 		})
 	}
 }
-
-//
-// Note to add for update and delete test unit
-//
 
 // mockRandomOrder create random user data
 func mockRandomOrder() db.PokeOrder {

@@ -46,3 +46,4 @@ Attached postman collection JSON on `./asset/` directory
 - pokemon section : crud pokemon data
   - localhost:8080/pokemon
 - order section : create, cancel, and list transaction
+  - localhost:8000/order
