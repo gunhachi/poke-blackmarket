@@ -185,24 +185,24 @@ func TestCreateUserAPI(t *testing.T) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
 			},
 		},
-		// {
-		// 	name: "InternalError",
-		// 	body: gin.H{
-		// 		"user_role": account.UserRole,
-		// 	},
-		// 	setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-		// 		addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
-		// 	},
-		// 	buildStubs: func(store *mockdb.MockStore) {
-		// 		store.EXPECT().
-		// 			CreateUserAccount(gomock.Any(), gomock.Any()).
-		// 			Times(1).
-		// 			Return(db.User{}, sql.ErrConnDone)
-		// 	},
-		// 	checkResponse: func(recorder *httptest.ResponseRecorder) {
-		// 		require.Equal(t, http.StatusInternalServerError, recorder.Code)
-		// 	},
-		// },
+		{
+			name: "InternalError",
+			body: gin.H{
+				"user_role": account.UserRole,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, user.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreateUserAccount(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.User{}, sql.ErrConnDone)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
 		{
 			name: "InvalidUserRole",
 			body: gin.H{
@@ -399,10 +399,6 @@ func TestListUserAPI(t *testing.T) {
 		})
 	}
 }
-
-//
-// Note to add for update and delete test unit
-//
 
 // mockRandomUser create random user data
 func mockRandomUser(user string) db.User {

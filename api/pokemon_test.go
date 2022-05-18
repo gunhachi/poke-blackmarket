@@ -9,11 +9,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/gunhachi/poke-blackmarket/db/mock"
 	db "github.com/gunhachi/poke-blackmarket/db/sqlc"
+	"github.com/gunhachi/poke-blackmarket/token"
 	"github.com/gunhachi/poke-blackmarket/util"
 	"github.com/stretchr/testify/require"
 )
@@ -25,11 +27,15 @@ func TestGetPokemonAPI(t *testing.T) {
 		name          string
 		pokeID        int64
 		buildStubs    func(store *mockdb.MockStore)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		checkResponse func(t *testing.T, recoder *httptest.ResponseRecorder)
 	}{
 		{
 			name:   "Succes_GetPokemon_API_nil_error",
 			pokeID: poke.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, gomock.Any().String(), time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetPokemonData(gomock.Any(), gomock.Eq(poke.ID)).
@@ -44,6 +50,9 @@ func TestGetPokemonAPI(t *testing.T) {
 		{
 			name:   "NotFound_GetPokemon_API_with_error",
 			pokeID: poke.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, gomock.Any().String(), time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetPokemonData(gomock.Any(), gomock.Eq(poke.ID)).
@@ -57,6 +66,9 @@ func TestGetPokemonAPI(t *testing.T) {
 		{
 			name:   "InternalError_GetPokemon_API_with_error",
 			pokeID: poke.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, gomock.Any().String(), time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetPokemonData(gomock.Any(), gomock.Eq(poke.ID)).
@@ -70,6 +82,9 @@ func TestGetPokemonAPI(t *testing.T) {
 		{
 			name:   "InvalidID_GetPokemon_API_with_error",
 			pokeID: 0,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, gomock.Any().String(), time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetPokemonData(gomock.Any(), gomock.Any()).
