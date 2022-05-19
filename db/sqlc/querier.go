@@ -19,6 +19,7 @@ type Querier interface {
 	GetPokemonOrderData(ctx context.Context, id int64) (PokeOrder, error)
 	GetUserAccount(ctx context.Context, id int64) (User, error)
 	InsertPokemonOrderData(ctx context.Context, arg InsertPokemonOrderDataParams) (PokeOrder, error)
+	ListOrderDetailedData(ctx context.Context, arg ListOrderDetailedDataParams) ([]ListOrderDetailedDataRow, error)
 	ListPokemonData(ctx context.Context, arg ListPokemonDataParams) ([]PokeProduct, error)
 	ListPokemonOrderData(ctx context.Context, arg ListPokemonOrderDataParams) ([]PokeOrder, error)
 	ListUserAccount(ctx context.Context, arg ListUserAccountParams) ([]User, error)

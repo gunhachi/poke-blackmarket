@@ -146,6 +146,41 @@ func (server *Server) listOrder(ctx *gin.Context) {
 
 }
 
+// listOrder handler to list the order on database
+func (server *Server) listOrderDetailed(ctx *gin.Context) {
+	var req listOrderRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, valid := server.validUser(ctx, req.UserID, "LEAD")
+	if !valid {
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.UserName != authPayload.Username {
+		err := errors.New("from account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	arg := db.ListOrderDetailedDataParams{
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
+	}
+
+	orders, err := server.store.ListOrderDetailedData(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, orders)
+
+}
+
 // cancelOrder handler to cancel pokemon order data based on id
 func (server *Server) cancelOrder(ctx *gin.Context) {
 	var req getOrderRequest

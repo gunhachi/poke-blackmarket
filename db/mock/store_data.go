@@ -228,6 +228,21 @@ func (mr *MockStoreMockRecorder) InsertPokemonOrderData(arg0, arg1 interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertPokemonOrderData", reflect.TypeOf((*MockStore)(nil).InsertPokemonOrderData), arg0, arg1)
 }
 
+// ListOrderDetailedData mocks base method.
+func (m *MockStore) ListOrderDetailedData(arg0 context.Context, arg1 db.ListOrderDetailedDataParams) ([]db.ListOrderDetailedDataRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListOrderDetailedData", arg0, arg1)
+	ret0, _ := ret[0].([]db.ListOrderDetailedDataRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListOrderDetailedData indicates an expected call of ListOrderDetailedData.
+func (mr *MockStoreMockRecorder) ListOrderDetailedData(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListOrderDetailedData", reflect.TypeOf((*MockStore)(nil).ListOrderDetailedData), arg0, arg1)
+}
+
 // ListPokemonData mocks base method.
 func (m *MockStore) ListPokemonData(arg0 context.Context, arg1 db.ListPokemonDataParams) ([]db.PokeProduct, error) {
 	m.ctrl.T.Helper()

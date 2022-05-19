@@ -74,6 +74,60 @@ func (q *Queries) InsertPokemonOrderData(ctx context.Context, arg InsertPokemonO
 	return i, err
 }
 
+const listOrderDetailedData = `-- name: ListOrderDetailedData :many
+select poke_orders.id, users.user_name, poke_products.poke_name, poke_orders.quantity , poke_orders.total_price , poke_orders.order_detail 
+FROM ((poke_orders
+inner join users on poke_orders.user_id  = users.id)
+inner join poke_products on poke_orders.product_id = poke_products.id)
+order by id
+limit $1
+OFFSET $2
+`
+
+type ListOrderDetailedDataParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+type ListOrderDetailedDataRow struct {
+	ID          int64  `json:"id"`
+	UserName    string `json:"user_name"`
+	PokeName    string `json:"poke_name"`
+	Quantity    int32  `json:"quantity"`
+	TotalPrice  int64  `json:"total_price"`
+	OrderDetail string `json:"order_detail"`
+}
+
+func (q *Queries) ListOrderDetailedData(ctx context.Context, arg ListOrderDetailedDataParams) ([]ListOrderDetailedDataRow, error) {
+	rows, err := q.db.QueryContext(ctx, listOrderDetailedData, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListOrderDetailedDataRow{}
+	for rows.Next() {
+		var i ListOrderDetailedDataRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserName,
+			&i.PokeName,
+			&i.Quantity,
+			&i.TotalPrice,
+			&i.OrderDetail,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPokemonOrderData = `-- name: ListPokemonOrderData :many
 SELECT id, user_id, product_id, quantity, total_price, order_detail, created_at FROM poke_orders
 ORDER BY id

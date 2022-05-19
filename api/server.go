@@ -57,6 +57,7 @@ func (server *Server) setupRouter() {
 	authRoute.DELETE("/order/:id", server.cancelOrder)
 
 	authRoute.GET("/order", server.listOrder)
+	authRoute.GET("/order-detailed", server.listOrderDetailed)
 	authRoute.PUT("/user/:id", server.updateUser)
 
 	server.route = router

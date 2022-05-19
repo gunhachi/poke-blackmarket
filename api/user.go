@@ -68,6 +68,7 @@ func (server *Server) getUser(ctx *gin.Context) {
 	if user.UserName != authPayload.Username {
 		err := errors.New("user dont belong to authenticated user")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
 	}
 
 	ctx.JSON(http.StatusOK, user)
